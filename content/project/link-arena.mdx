@@ -1,0 +1,32 @@
+---
+title: Link Arena
+subtitle: A fast, keyboard-first bookmarking manager for people who collect more links than they can read.
+date: 2026-05-10
+icon: /projects/linkarena.ico
+image: /projects/linkarena.ico
+stack: [Next.js, TypeScript, React, Tailwind, PostgreSQL, Redis]
+liveUrl: https://linkarena.app/
+githubUrl: https://github.com/sayeedjoy
+---
+
+Link Arena started as a personal itch: every read-it-later app I tried was
+either too heavy, too slow, or buried saving behind three taps. I wanted
+something that felt like a command line for the web — paste, tag, done.
+
+## What it does
+
+- **Instant capture** — a global hotkey and a paste box that parses titles,
+  favicons, and metadata in the background so saving never blocks you.
+- **Smart organisation** — tags, full-text search, and collections that stay
+  fast even past tens of thousands of links.
+- **Sync everywhere** — a thin client backed by a Postgres source of truth with
+  Redis caching the hot paths.
+
+## How it's built
+
+The frontend is a Next.js App Router app with React Server Components doing the
+heavy lifting, so the initial payload stays tiny. Postgres holds the canonical
+data; Redis fronts the search and feed queries that get hit on every keystroke.
+
+The result is a tool that disappears into the workflow — exactly what a
+bookmarking app should do.

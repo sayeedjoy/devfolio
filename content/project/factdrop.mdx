@@ -1,0 +1,33 @@
+---
+title: FactDrop
+subtitle: An AI-powered fact-checking engine that turns a claim into a sourced verdict in seconds.
+date: 2026-03-22
+icon: /projects/factdrop.png
+image: /projects/factdrop.png
+stack: [Python, FastAPI, PostgreSQL, Next.js, Docker]
+liveUrl: https://factdrop.org/
+githubUrl: https://github.com/sayeedjoy
+---
+
+FactDrop grew out of the work at Rumor Scanner: human fact-checkers are
+accurate but slow, and the internet ships misinformation faster than any team
+can keep up. FactDrop is the first-pass triage — it gathers evidence, weighs
+sources, and hands reviewers a head start instead of a blank page.
+
+## What it does
+
+- **Claim ingestion** — paste a claim, a URL, or a social post and FactDrop
+  extracts the verifiable assertions inside it.
+- **Evidence retrieval** — it searches a curated index of trusted sources and
+  ranks passages by relevance and credibility.
+- **Explained verdicts** — every verdict ships with the citations behind it, so
+  a human can audit the reasoning rather than trust a black box.
+
+## How it's built
+
+A FastAPI service orchestrates retrieval and the model calls; Postgres stores
+claims, sources, and the audit trail. The reviewer-facing dashboard is a Next.js
+app, and the whole thing ships as containers so it runs the same locally and in
+production.
+
+It doesn't replace fact-checkers — it makes each one faster.
