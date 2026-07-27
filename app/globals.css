@@ -142,6 +142,10 @@
     }
   html {
     @apply font-sans;
+    /* Full-bleed rows (the photo marquee) are 100vw inside a max-w-2xl
+       column; clip — not hidden — keeps that from adding a page scrollbar
+       without turning <html> into a scroll container and breaking sticky. */
+    overflow-x: clip;
     }
 }
 

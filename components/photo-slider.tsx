@@ -5,120 +5,198 @@ import { useEffect, useRef } from "react"
 
 import { cn } from "@/lib/utils"
 
-// Per-photo tilt (desktop only) for the loosely scattered, hand-placed feel.
-// Applied at sm+ so the mobile slider stays upright and clean.
-const TILTS = [
-  "sm:-rotate-3",
-  "sm:rotate-2",
-  "sm:-rotate-2",
-  "sm:rotate-3",
-  "sm:-rotate-1",
-]
+type Photo = { src: string; caption?: string; title?: string }
 
-type Photo = { src: string; caption?: string }
+// Marquee speed, in CSS pixels per second. Slow enough to read a caption in
+// passing, fast enough that the row never looks frozen.
+const SPEED_MOBILE = 22
+const SPEED_DESKTOP = 34
+
+// How long the auto-scroll stays out of the way after the visitor drags,
+// flicks, or wheels the row themselves.
+const RESUME_DELAY_MS = 1600
+
+// The loop only works if one copy of the list is at least as wide as the
+// viewport — otherwise the row can't scroll far enough to reach the rewind
+// point and the browser clamps it, which reads as "the slider is broken".
+// A card is at most 320px + 16px gap, so 12 items covers a 4K screen; short
+// galleries repeat themselves to get there.
+const MIN_ITEMS_PER_COPY = 12
 
 /**
- * Horizontal photo row with a different frame per breakpoint:
- * - Mobile: large frameless, full-bleed rounded photos in a snap slider that
- *   auto-advances.
- * - Desktop: white "polaroid" matte cards, scattered and static.
+ * Full-bleed photo marquee.
  *
- * Receives only non-sensitive photo data (src + caption) so the rest of the
- * dataset stays server-side.
+ * The track holds two identical copies of the list, so scrolling past the
+ * width of the first copy can be rewound by exactly that width without any
+ * visible seam — an infinite loop with no clones to manage.
+ *
+ * Motion is driven by `scrollLeft` rather than a CSS transform on purpose:
+ * the row stays a real scroll container, so touch swiping, trackpad flicks,
+ * and keyboard scrolling all keep working while the animation runs.
+ *
+ * Receives only non-sensitive photo data (src + caption/title) so the rest of
+ * the dataset stays server-side.
  */
 export function PhotoSlider({ photos }: { photos: Photo[] }) {
   const scrollerRef = useRef<HTMLDivElement>(null)
+  const trackRef = useRef<HTMLUListElement>(null)
 
   useEffect(() => {
     const el = scrollerRef.current
-    if (!el || photos.length < 2) return
+    const track = trackRef.current
+    if (!el || !track || photos.length < 2) return
 
-    const isMobile = window.matchMedia("(max-width: 639px)")
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)")
+    const desktop = window.matchMedia("(min-width: 640px)")
 
-    let timer: ReturnType<typeof setInterval> | undefined
-    let paused = false
+    let raf = 0
+    let last = 0
+    // Sub-pixel position we own; `scrollLeft` is rounded by some browsers, so
+    // accumulating directly on it would stall at these speeds.
+    let offset = 0
+    let holdUntil = 0
+    // Set while we write `scrollLeft` ourselves, so the scroll handler can
+    // tell our own motion apart from the visitor's.
+    let syncing = false
 
-    const advance = () => {
-      if (paused) return
-      const first = el.firstElementChild as HTMLElement | null
-      if (!first) return
-      const gap = parseFloat(getComputedStyle(el).columnGap) || 16
-      const slide = first.offsetWidth + gap
-      const maxScroll = el.scrollWidth - el.clientWidth
-      // Loop back to the start once we reach the end.
-      const next = el.scrollLeft + slide > maxScroll + 4 ? 0 : el.scrollLeft + slide
-      el.scrollTo({ left: next, behavior: "smooth" })
+    // Each item carries its gap as a right margin, so one copy of the list
+    // measures exactly one loop period.
+    let loop = 0
+
+    const measure = () => {
+      // Never ask for more scroll than the container can actually give, or the
+      // browser clamps `scrollLeft` and the row stalls at the far end. On a
+      // correctly sized track these are equal and the rewind is invisible.
+      loop = Math.min(track.offsetWidth, el.scrollWidth - el.clientWidth)
+      if (loop > 0) offset = offset % loop
     }
 
-    const start = () => {
-      clearTimer()
-      if (isMobile.matches && !reduce.matches) {
-        timer = setInterval(advance, 2800)
+    measure()
+
+    const step = (now: number) => {
+      raf = requestAnimationFrame(step)
+      const dt = last ? Math.min((now - last) / 1000, 0.05) : 0
+      last = now
+
+      if (now < holdUntil || loop <= 0) return
+
+      const speed = desktop.matches ? SPEED_DESKTOP : SPEED_MOBILE
+      offset = (offset + speed * dt) % loop
+      syncing = true
+      el.scrollLeft = offset
+    }
+
+    const onScroll = () => {
+      if (syncing) {
+        syncing = false
+        return
       }
-    }
-    const clearTimer = () => {
-      if (timer) clearInterval(timer)
-      timer = undefined
-    }
-
-    // Pause while the user is actively touching/dragging the row.
-    const pause = () => {
-      paused = true
-    }
-    const resume = () => {
-      paused = false
+      // A manual scroll: adopt its position, and rewind once it crosses into
+      // the second copy so the visitor can keep swiping forever too.
+      if (loop > 0 && el.scrollLeft >= loop) {
+        syncing = true
+        el.scrollLeft -= loop
+      }
+      offset = loop > 0 ? el.scrollLeft % loop : el.scrollLeft
     }
 
-    start()
-    isMobile.addEventListener("change", start)
-    el.addEventListener("pointerdown", pause)
-    window.addEventListener("pointerup", resume)
-    el.addEventListener("touchstart", pause, { passive: true })
-    window.addEventListener("touchend", resume)
+    const hold = () => {
+      holdUntil = Number.POSITIVE_INFINITY
+    }
+    const release = () => {
+      holdUntil = performance.now() + RESUME_DELAY_MS
+    }
+    const nudge = () => {
+      holdUntil = performance.now() + RESUME_DELAY_MS
+    }
+    // Watch both: the track sets the loop period, the scroller sets the
+    // clamp. A breakpoint change moves either one.
+    const ro = new ResizeObserver(measure)
+    ro.observe(track)
+    ro.observe(el)
+
+    el.addEventListener("scroll", onScroll, { passive: true })
+    el.addEventListener("wheel", nudge, { passive: true })
+    el.addEventListener("pointerdown", hold)
+    el.addEventListener("touchstart", hold, { passive: true })
+    window.addEventListener("pointerup", release)
+    // Touch scrolling cancels the pointer stream rather than ending it, so
+    // without this the row would stay held forever after a swipe.
+    window.addEventListener("pointercancel", release)
+    window.addEventListener("touchend", release)
+    window.addEventListener("touchcancel", release)
+
+    raf = requestAnimationFrame(step)
 
     return () => {
-      clearTimer()
-      isMobile.removeEventListener("change", start)
-      el.removeEventListener("pointerdown", pause)
-      window.removeEventListener("pointerup", resume)
-      el.removeEventListener("touchstart", pause)
-      window.removeEventListener("touchend", resume)
+      cancelAnimationFrame(raf)
+      ro.disconnect()
+      el.removeEventListener("scroll", onScroll)
+      el.removeEventListener("wheel", nudge)
+      el.removeEventListener("pointerdown", hold)
+      el.removeEventListener("touchstart", hold)
+      window.removeEventListener("pointerup", release)
+      window.removeEventListener("pointercancel", release)
+      window.removeEventListener("touchend", release)
+      window.removeEventListener("touchcancel", release)
     }
   }, [photos.length])
+
+  // One copy of the row, padded out to MIN_ITEMS_PER_COPY so it always spans
+  // the viewport. The same files repeat, so this costs DOM nodes, not
+  // requests — but a gallery with more photos repeats itself less.
+  const repeat = Math.max(1, Math.ceil(MIN_ITEMS_PER_COPY / photos.length))
+  const row = Array.from({ length: repeat }, () => photos).flat()
+
+  // Two copies of that row. The second is a decorative stand-in for the first,
+  // so it stays out of the accessibility tree.
+  const copies = photos.length > 1 ? [0, 1] : [0]
 
   return (
     <div
       ref={scrollerRef}
-      className="mt-8 -mx-6 flex snap-x snap-mandatory items-center gap-4 overflow-x-auto px-6 py-4 [scrollbar-width:none] sm:mx-0 sm:snap-none sm:justify-center sm:gap-5 sm:overflow-visible sm:px-0 sm:py-0 [&::-webkit-scrollbar]:hidden"
+      // Break out of the max-w-2xl column and run the row edge to edge, the
+      // way the section reads on a wide screen. `html { overflow-x: clip }`
+      // in globals.css keeps the 100vw width from adding a page scrollbar.
+      className="relative left-1/2 mt-8 w-screen -translate-x-1/2 [scrollbar-width:none] overflow-x-auto overscroll-x-contain [&::-webkit-scrollbar]:hidden"
     >
-      {photos.map((photo, i) => (
-        <figure
-          key={i}
-          className={cn(
-            "group relative shrink-0 snap-center bg-white transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:z-10",
-            // Mobile: large, frameless, full-bleed rounded card.
-            "w-[80vw] max-w-[22rem] rounded-3xl ring-1 ring-white/15",
-            // Desktop: white polaroid matte (bottom-heavy), scattered + lift on hover.
-            "sm:w-52 sm:max-w-none sm:rounded-lg sm:p-2.5 sm:pb-8 sm:ring-black/10 sm:hover:-translate-y-2 sm:hover:rotate-0",
-            TILTS[i % TILTS.length]
-          )}
-        >
-          <div className="relative aspect-square w-full overflow-hidden rounded-[inherit] sm:rounded-sm">
-            <Image
-              src={photo.src}
-              alt={photo.caption ?? ""}
-              fill
-              quality={100}
-              // Mobile photos fill ~80vw, so request that width; desktop matte
-              // holds a ~208px print. next/image adds the 2×/3× srcset on top,
-              // keeping every photo crisp and full-resolution on HiDPI screens.
-              sizes="(min-width: 640px) 208px, 80vw"
-              className="object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
-            />
-          </div>
-        </figure>
-      ))}
+      <div className="flex w-max px-4 sm:px-6">
+        {copies.map((copy) => (
+          <ul
+            key={copy}
+            ref={copy === 0 ? trackRef : undefined}
+            aria-hidden={copy > 0 || undefined}
+            className="flex"
+          >
+            {row.map((photo, i) => (
+              <li key={i} className="mr-3 shrink-0 sm:mr-4">
+                <figure
+                  className={cn(
+                    "group relative overflow-hidden rounded-2xl bg-muted ring-1 ring-black/5 dark:ring-white/10",
+                    "aspect-[4/3] w-[78vw] max-w-[21rem] sm:w-72 lg:w-80"
+                  )}
+                >
+                  <Image
+                    src={photo.src}
+                    alt={copy > 0 ? "" : (photo.title ?? photo.caption ?? "")}
+                    fill
+                    quality={100}
+                    // ~78vw on mobile, a fixed print on sm+. next/image layers
+                    // the 2×/3× srcset on top so HiDPI screens stay crisp.
+                    sizes="(min-width: 1024px) 320px, (min-width: 640px) 288px, 78vw"
+                    className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
+                  />
+
+                  {photo.title ? (
+                    <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent px-4 pt-10 pb-3.5 text-sm leading-snug font-semibold text-white sm:pt-12 sm:pb-4">
+                      <span className="line-clamp-2">{photo.title}</span>
+                    </figcaption>
+                  ) : null}
+                </figure>
+              </li>
+            ))}
+          </ul>
+        ))}
+      </div>
     </div>
   )
 }
