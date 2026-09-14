@@ -36,7 +36,7 @@ export function PhotoGallery({ photos }: { photos: Personal["photos"] }) {
             width={photo.width}
             height={photo.height}
             quality={100}
-            sizes="(min-width: 896px) 278px, (min-width: 640px) calc((100vw - 64px) / 3), calc((100vw - 56px) / 2)"
+            sizes="(min-width: 896px) 203px, (min-width: 640px) calc((100vw - 64px) / 3), calc((100vw - 56px) / 2)"
             className="block h-auto w-full rounded-lg grayscale transition-[filter] duration-300 group-hover/gallery:grayscale-0 motion-reduce:transition-none"
           />
         </li>
