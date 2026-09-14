@@ -1,5 +1,5 @@
-import { PhotoSlider } from "@/components/photo-slider"
-import { Section, SectionIntro, SectionLabel } from "@/components/section"
+import { PhotoGallery } from "@/components/photo-gallery"
+import { Section } from "@/components/section"
 import content from "@/data/content"
 
 function InstagramIcon({ className }: { className?: string }) {
@@ -54,35 +54,44 @@ export function Personal() {
   const shotWith = personal.photos.find((p) => p.caption)?.caption
 
   return (
-    <Section>
-      <SectionLabel>Personal</SectionLabel>
-      <SectionIntro>{personal.intro}</SectionIntro>
+    <Section
+      aria-labelledby="gallery-heading"
+      className="relative left-1/2 my-5 w-screen -translate-x-1/2 bg-background text-foreground"
+    >
+      <div className="mx-auto max-w-[896px] px-6 py-3">
+        <h2
+          id="gallery-heading"
+          className="mb-6 text-3xl leading-tight font-semibold tracking-tight sm:text-4xl"
+        >
+          Curated Vibes
+        </h2>
 
-      <PhotoSlider photos={personal.photos} />
+        <PhotoGallery photos={personal.photos} />
 
-      <div className="mt-6 flex items-center justify-between gap-2 text-xs text-muted-foreground sm:text-sm">
-        {shotWith ? (
-          <span>
-            <span className="text-muted-foreground/70">Shot with</span>{" "}
-            <span className="font-medium text-foreground/80">
-              {shotWith.replace(/^Shot with\s*/i, "")}
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground sm:text-sm">
+          {shotWith ? (
+            <span>
+              <span>Shot with</span>{" "}
+              <span className="font-medium text-foreground/80">
+                {shotWith.replace(/^Shot with\s*/i, "")}
+              </span>
             </span>
-          </span>
-        ) : (
-          <span />
-        )}
+          ) : (
+            <span />
+          )}
 
-        {personal.instagram ? (
-          <a
-            href={personal.instagram}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group inline-flex shrink-0 items-center gap-1.5 transition-colors hover:text-foreground sm:gap-2"
-          >
-            See more on IG
-            <InstagramIcon className="size-4 transition-transform group-hover:-translate-y-0.5 sm:size-[18px]" />
-          </a>
-        ) : null}
+          {personal.instagram ? (
+            <a
+              href={personal.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex shrink-0 items-center gap-1.5 rounded-sm transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring sm:gap-2"
+            >
+              See more on IG
+              <InstagramIcon className="size-4 transition-transform group-hover:-translate-y-0.5 sm:size-[18px]" />
+            </a>
+          ) : null}
+        </div>
       </div>
     </Section>
   )

@@ -84,9 +84,14 @@ export interface Experience {
 
 export interface Personal {
   intro: string
-  // `caption` credits the gear (surfaced once, under the row); `title` is the
-  // optional label drawn over the photo in the slider.
-  photos: { src: string; caption?: string; title?: string }[]
+  // Intrinsic dimensions reserve space for each uncropped photo.
+  photos: {
+    src: string
+    width: number
+    height: number
+    caption?: string
+    title?: string
+  }[]
   instagram?: string
   spotify?: string
 }
