@@ -26,7 +26,9 @@ export async function generateMetadata({
   return {
     title: `#${tag}`,
     description: `Posts tagged "${tag}".`,
-    alternates: { canonical: `${SITE_URL}/blog/tag/${encodeURIComponent(tag)}` },
+    alternates: {
+      canonical: `${SITE_URL}/blog/tag/${encodeURIComponent(tag)}`,
+    },
   }
 }
 

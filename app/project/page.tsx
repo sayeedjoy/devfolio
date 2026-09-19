@@ -22,8 +22,8 @@ export default function ProjectIndexPage() {
         <header className="mb-6">
           <h1 className="text-3xl font-semibold tracking-tight">Projects</h1>
           <p className="mt-2 text-muted-foreground">
-            {projects.length} project{projects.length === 1 ? "" : "s"} I&apos;ve
-            designed, built, and shipped.
+            {projects.length} project{projects.length === 1 ? "" : "s"}{" "}
+            I&apos;ve designed, built, and shipped.
           </p>
         </header>
 

@@ -7,6 +7,7 @@ export const ventures: Venture[] = [
     href: "https://factdrop.org/",
     slug: "factdrop",
     icon: "/projects/factdrop.png",
+    preview: "/projects/hover/factdrop-preview.webp",
   },
   {
     name: "Link Arena",
@@ -14,6 +15,7 @@ export const ventures: Venture[] = [
     href: "https://linkarena.app/",
     slug: "link-arena",
     icon: "/projects/linkarena.ico",
+    preview: "/projects/hover/linkarena-preview.webp",
   },
   {
     name: "SEU CampusMate",
@@ -21,5 +23,6 @@ export const ventures: Venture[] = [
     href: "https://campusmate.app",
     slug: "seu-campusmate",
     icon: "/projects/seu.png",
+    preview: "/projects/hover/campusmate-preview.webp",
   },
 ]

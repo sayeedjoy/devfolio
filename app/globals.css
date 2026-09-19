@@ -56,6 +56,14 @@
     --radius-3xl: calc(var(--radius) * 2.2);
     --radius-4xl: calc(var(--radius) * 2.6);
     --color-line: color-mix(in oklab, var(--border) 64%, var(--background));
+    --color-flare-1: var(--flare-1);
+    --color-flare-2: var(--flare-2);
+    --color-flare-3: var(--flare-3);
+    --color-flare-foreground: var(--flare-foreground);
+    --color-panel: var(--panel);
+    --color-panel-foreground: var(--panel-foreground);
+    --color-chip: var(--chip);
+    --color-chip-foreground: var(--chip-foreground);
 }
 
 :root {
@@ -84,6 +92,19 @@
     --chart-5: oklch(0.269 0 0);
     --radius: 0.625rem;
     --link: oklch(0.58 0.2 256);
+    /* Warm three-stop ramp behind the headline stat card, plus the always-dark
+       "panel" surface beside it. Both are deliberately theme-stable: those two
+       cards read as printed inserts rather than following the page. */
+    --flare-1: oklch(0.68 0.24 350);
+    --flare-2: oklch(0.76 0.18 45);
+    --flare-3: oklch(0.88 0.15 90);
+    --flare-foreground: oklch(1 0 0);
+    --panel: oklch(0.14 0 0);
+    --panel-foreground: oklch(0.98 0 0);
+    /* Inline bio chips: a wash of the accent, dark enough text to stay
+       readable on it. Mixed from --link so the two never drift apart. */
+    --chip: color-mix(in oklab, var(--link) 13%, var(--background));
+    --chip-foreground: color-mix(in oklab, var(--link) 78%, var(--foreground));
     --bubble: oklch(0.58 0.2 256);
     --bubble-foreground: oklch(1 0 0);
     --sidebar: oklch(0.985 0 0);
@@ -121,6 +142,14 @@
     --chart-4: oklch(0.371 0 0);
     --chart-5: oklch(0.269 0 0);
     --link: oklch(0.68 0.16 256);
+    --flare-1: oklch(0.62 0.22 350);
+    --flare-2: oklch(0.7 0.17 45);
+    --flare-3: oklch(0.82 0.14 90);
+    --flare-foreground: oklch(1 0 0);
+    --panel: oklch(0.1 0 0);
+    --panel-foreground: oklch(0.98 0 0);
+    --chip: color-mix(in oklab, var(--link) 16%, var(--background));
+    --chip-foreground: color-mix(in oklab, var(--link) 70%, var(--foreground));
     --bubble: oklch(0.62 0.2 256);
     --bubble-foreground: oklch(1 0 0);
     --sidebar: oklch(0.205 0 0);

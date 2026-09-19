@@ -56,7 +56,8 @@ const uses: UsesData = {
     {
       name: "MSI MAG X870 Tomahawk WiFi",
       description: "Motherboard",
-      image: "/gears/msi-mag-x870-mag-tomahawk-wifi-pcb-design-6a37fa2757f7d.webp",
+      image:
+        "/gears/msi-mag-x870-mag-tomahawk-wifi-pcb-design-6a37fa2757f7d.webp",
     },
     {
       name: "G.Skill Trident Z5 Neo RGB",

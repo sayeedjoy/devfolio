@@ -6,13 +6,14 @@ export const profile: Profile = {
   avatar: "/photos/joy.webp",
   bio: [
     [
-      "I like building things that people actually use. From polished user experiences to scalable backend systems, I work across the stack and am currently building ",
+      "I enjoy turning complex ideas into software that feels simple and dependable. Most of my work is in enterprise platforms and SaaS, and right now I’m bringing that experience to ",
       {
         type: "link",
         text: "Link Arena",
         href: "https://linkarena.app/",
         logo: "/linkarena.ico",
       },
+      ".",
     ],
   ],
   verified: true,

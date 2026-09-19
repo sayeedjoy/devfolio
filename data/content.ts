@@ -17,6 +17,8 @@
  * import rule.
  */
 
+import { about } from "./about"
+import { capabilities } from "./capabilities"
 import { contact } from "./contact"
 import { education } from "./education"
 import { experience } from "./experience"
@@ -44,6 +46,8 @@ const content: SiteContent = {
   ventures,
   personal,
   contact,
+  about,
+  capabilities,
 }
 
 export default content

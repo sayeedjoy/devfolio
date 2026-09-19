@@ -10,6 +10,8 @@
     "dev": "next dev -H localhost -p 1408",
     "build": "next build",
     "start": "next start -H 0.0.0.0 -p ${PORT:-3000}",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "lint": "eslint",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit"
@@ -17,6 +19,7 @@
   "dependencies": {
     "@base-ui/react": "^1.5.0",
     "@dev.icons/react": "^1.1.0",
+    "@paper-design/shaders-react": "^0.0.81",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.4.0",
@@ -42,6 +45,7 @@
     "unist-util-visit": "^5.1.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@tailwindcss/typography": "^0.5.20",
     "@types/hast": "^3.0.4",

@@ -100,7 +100,10 @@ export function UsesContent({ data }: { data: UsesData }) {
         <SectionHeading>Software</SectionHeading>
         <ul className="grid grid-cols-3 gap-x-4 gap-y-6 sm:grid-cols-4 md:grid-cols-5">
           {data.software.map((app) => (
-            <li key={app.name} className="flex flex-col items-center gap-2 text-center">
+            <li
+              key={app.name}
+              className="flex flex-col items-center gap-2 text-center"
+            >
               <Thumb
                 src={app.icon}
                 name={app.name}

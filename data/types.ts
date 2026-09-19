@@ -19,6 +19,11 @@ export interface ExperienceItem {
   company: string
   /** path under /public, e.g. "/logos/foo.png" — shown next to the company */
   logo?: string
+  /**
+   * path under /public, e.g. "/previews/foo.png" — the screenshot the hover
+   * preview parks in the page gutter while the row is hovered.
+   */
+  preview?: string
   description: string
 }
 
@@ -116,4 +121,69 @@ export interface SiteContent {
   ventures: Venture[]
   personal: Personal
   contact: Contact
+  /** /about page copy: long bio, the two rails, and the link list */
+  about: About
+  /** the three-up pitch block rendered by `<CapabilityCards />` */
+  capabilities: Capabilities
+}
+
+/** Icon key for an about-page link row; resolved to a glyph in the component. */
+export type LinkIcon = "email" | "x" | "github" | "linkedin" | "website"
+
+export interface AboutLink {
+  label: string
+  /**
+   * What shows on the right of the row — a handle, not an address. The email
+   * row is special-cased: it copies through the server action instead of
+   * linking, so the address never reaches the rendered HTML.
+   */
+  value: string
+  href?: string
+  icon: LinkIcon
+}
+
+export interface About {
+  /** greeting beside the avatar, e.g. "Hey I'm Ada" */
+  greeting: string
+  /** playful caption under the greeting; doubles as the link home */
+  caption: string
+  /** longer-form bio, independent of the short one in `profile` */
+  bio: BioParagraph[]
+  whatIDo: string[]
+  interests: string[]
+  links: AboutLink[]
+}
+
+/** Icon key for a "what I bring" bullet, resolved in the component. */
+export type CapabilityIcon =
+  | "design"
+  | "database"
+  | "code"
+  | "ship"
+  | "research"
+  | "growth"
+
+/**
+ * Data behind `<CapabilityCards />` — the three-up pitch block. It is a
+ * standalone component, so this stays a self-contained slice rather than being
+ * spread across the other sections.
+ */
+export interface Capabilities {
+  /** the accent half renders in italic serif, as the closing clause */
+  stat: { value: string; label: string }
+  bring: { label: string; items: { text: string; icon: CapabilityIcon }[] }
+  /** the dark panel: a claim plus the two ends of the range it moves */
+  pitch: { text: string; from: string; to: string }
+  testimonial: {
+    brand: string
+    /** path under /public; falls back to the brand initial when absent */
+    brandLogo?: string
+    quote: string
+    /** tail of the quote, rendered emphasised */
+    highlight: string
+    author: string
+    role: string
+    /** path under /public; falls back to initials when absent */
+    avatar?: string
+  }
 }

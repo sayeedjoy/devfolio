@@ -24,6 +24,11 @@ export interface ProjectMetadata {
   icon?: string
   /** feature image path under /public, e.g. "/projects/foo/cover.png" */
   image?: string
+  /**
+   * Screenshot the hover preview shows on the /project list, e.g.
+   * "/previews/foo.png". Optional and purely decorative.
+   */
+  preview?: string
   /** tech stack names — keys of MY_STACKS render with an icon */
   stack: string[]
   /** public live/demo URL */
@@ -77,6 +82,7 @@ function normalizeMetadata(
     date,
     icon: typeof data.icon === "string" ? data.icon : undefined,
     image: typeof data.image === "string" ? data.image : undefined,
+    preview: typeof data.preview === "string" ? data.preview : undefined,
     stack: Array.isArray(data.stack) ? (data.stack as string[]) : [],
     liveUrl: typeof data.liveUrl === "string" ? data.liveUrl : undefined,
     githubUrl: typeof data.githubUrl === "string" ? data.githubUrl : undefined,
