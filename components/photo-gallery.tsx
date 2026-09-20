@@ -27,7 +27,7 @@ export function PhotoGallery({ photos }: { photos: Personal["photos"] }) {
   if (!photos.length) return null
 
   return (
-    <ul className="group/gallery columns-2 gap-2 sm:columns-3">
+    <ul className="columns-2 gap-2 sm:columns-3">
       {arrangedPhotos.map((photo) => (
         <li key={photo.src} className="mb-2 break-inside-avoid">
           <Image
@@ -37,7 +37,7 @@ export function PhotoGallery({ photos }: { photos: Personal["photos"] }) {
             height={photo.height}
             quality={100}
             sizes="(min-width: 896px) 203px, (min-width: 640px) calc((100vw - 64px) / 3), calc((100vw - 56px) / 2)"
-            className="block h-auto w-full rounded-lg grayscale transition-[filter] duration-300 group-hover/gallery:grayscale-0 motion-reduce:transition-none"
+            className="block h-auto w-full rounded-lg grayscale transition-[filter] duration-300 hover:grayscale-0 motion-reduce:transition-none"
           />
         </li>
       ))}

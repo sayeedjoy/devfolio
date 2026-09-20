@@ -1,5 +1,5 @@
 import { PhotoGallery } from "@/components/photo-gallery"
-import { Section } from "@/components/section"
+import { Section, SectionIntro, SectionLabel } from "@/components/section"
 import content from "@/data/content"
 
 function InstagramIcon({ className }: { className?: string }) {
@@ -59,12 +59,13 @@ export function Personal() {
       className="my-5 bg-background text-foreground"
     >
       <div className="py-3">
-        <h2
-          id="gallery-heading"
-          className="mb-6 text-3xl leading-tight font-semibold tracking-tight sm:text-4xl"
-        >
-          Curated Vibes
-        </h2>
+        <SectionLabel id="gallery-heading" className="mb-2">
+          Moments
+        </SectionLabel>
+
+        <SectionIntro>
+          Contests, hackathons, trips, and the people along the way.
+        </SectionIntro>
 
         <PhotoGallery photos={personal.photos} />
 
