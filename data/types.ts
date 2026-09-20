@@ -44,6 +44,13 @@ export interface Venture {
   preview?: string
 }
 
+export interface Achievement {
+  title: string
+  description: string
+  /** path under /public, e.g. "/achievements/foo.png" — the logo on the left */
+  image?: string
+}
+
 export interface StackItem {
   name: string
 }
@@ -119,6 +126,7 @@ export interface SiteContent {
   stuffIDo: string
   stack: StackItem[]
   ventures: Venture[]
+  achievements: Achievement[]
   personal: Personal
   contact: Contact
   /** /about page copy: long bio, the two rails, and the link list */

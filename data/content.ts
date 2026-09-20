@@ -18,6 +18,7 @@
  */
 
 import { about } from "./about"
+import { achievements } from "./achievements"
 import { capabilities } from "./capabilities"
 import { contact } from "./contact"
 import { education } from "./education"
@@ -44,6 +45,7 @@ const content: SiteContent = {
     "Apps, SaaS, APIs, open source, writing, and more. I love building things that people find useful and delightful.",
   stack,
   ventures,
+  achievements,
   personal,
   contact,
   about,

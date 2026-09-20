@@ -1,3 +1,4 @@
+import { Achievements } from "@/components/achievements"
 import { Contact } from "@/components/contact"
 import { EmailCopyHotkey } from "@/components/email-copy-hotkey"
 import { Experience } from "@/components/experience"
@@ -20,6 +21,7 @@ export default function Page() {
         <Experience />
         <Stack />
         <Ventures />
+        <Achievements />
         <Writing />
         <Personal />
         <Contact />
