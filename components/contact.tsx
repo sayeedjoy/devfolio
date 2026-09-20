@@ -1,5 +1,5 @@
 import { CopyEmailButton } from "@/components/copy-email-button"
-import { GitHubIcon, LinkedInIcon } from "@/components/social-icons"
+import { GitHubIcon, LinkedInIcon, XIcon } from "@/components/social-icons"
 import { Section, SectionLabel } from "@/components/section"
 import { buttonVariants } from "@/components/ui/button"
 import content from "@/data/content"
@@ -7,6 +7,7 @@ import content from "@/data/content"
 const SOCIAL_ICONS = {
   linkedin: LinkedInIcon,
   github: GitHubIcon,
+  x: XIcon,
 }
 
 function Bubble({

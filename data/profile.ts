@@ -17,4 +17,13 @@ export const profile: Profile = {
     ],
   ],
   verified: true,
+  socials: [
+    { label: "X", href: "https://x.com/sayeedjoy", icon: "x" },
+    { label: "GitHub", href: "https://github.com/sayeedjoy", icon: "github" },
+    {
+      label: "LinkedIn",
+      href: "https://linkedin.com/in/sayeedjoy",
+      icon: "linkedin",
+    },
+  ],
 }

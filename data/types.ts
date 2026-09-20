@@ -76,7 +76,7 @@ export function bioText(paragraph: BioParagraph): string {
 export interface SocialLink {
   label: string
   href: string
-  icon?: "linkedin" | "github"
+  icon?: "linkedin" | "github" | "x"
 }
 
 export interface Profile {
@@ -87,6 +87,8 @@ export interface Profile {
   /** bio paragraphs; each is a list of inline segments (text/link/tag) */
   bio: BioParagraph[]
   verified: boolean
+  /** icon-only links rendered as tiles under the hero bio */
+  socials: SocialLink[]
 }
 
 export interface Experience {
