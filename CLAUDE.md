@@ -10,11 +10,19 @@ Routes: `/`, `/about`, `/uses`, `/blog`, `/blog/[slug]`, `/blog/tag/[tag]`, `/pr
 
 ## Next.js version warning
 
-This is Next.js **16**, which has breaking changes from the versions in your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing Next-specific code, and heed deprecation notices rather than assuming APIs from memory. `.agents/skills/next-best-practices/` holds topic-scoped notes (RSC boundaries, async APIs, metadata, route handlers, caching).
+This is Next.js **16**, which has breaking changes from the versions in your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing Next-specific code, and heed deprecation notices rather than assuming APIs from memory.
+
+Three vendored skills sit in `.claude/skills/` (mirrored at `.agents/skills/`, pinned by `skills-lock.json` — edit upstream, not the copies):
+
+- `next-best-practices` — topic-scoped Next 16 notes (RSC boundaries, async APIs, metadata, route handlers, caching)
+- `vercel-react-best-practices` — one rule per file under `rules/`
+- `frontend-design`
+
+Concretely, `middleware.ts` is gone in 16: the root `proxy.ts` is the replacement (see below).
 
 ## Commands
 
-This project uses **pnpm**.
+This project uses **pnpm**. Node `>=20.9`; `.nvmrc` pins 22.
 
 - `pnpm dev` — dev server (Turbopack), pinned to `-H localhost -p 1408`
 - `pnpm build` — production build
@@ -22,12 +30,22 @@ This project uses **pnpm**.
 - `pnpm lint` — ESLint (`eslint-config-next`)
 - `pnpm typecheck` — `tsc --noEmit`
 - `pnpm format` — Prettier write over `**/*.{ts,tsx}`
+- `pnpm test:e2e` — Playwright (chromium only); `pnpm test:e2e:ui` for the UI runner
 
-There is no test suite. Standard verification is `pnpm typecheck && pnpm build`.
+Standard verification is `pnpm typecheck && pnpm build`. The Playwright suite is a thin smoke test (`e2e/`), not broad coverage.
+
+Playwright's `webServer` starts `pnpm dev` itself and reuses an already-running one outside CI, so don't hand-start a server first. Single file / single test:
+
+```bash
+pnpm exec playwright test e2e/home.spec.ts
+pnpm exec playwright test -g "primary navigation"
+```
 
 ## Content model
 
-Site content is split one file per section under `data/` (`profile`, `work`, `experience`, `education`, `stack`, `ventures`, `personal`, `contact`, `uses`). `data/content.ts` composes those slices into a single typed default export and re-exports `data/types.ts`, so `@/data/content` stays the one import surface for the app.
+Site content is split one file per section under `data/` (`profile`, `work`, `experience`, `education`, `stack`, `ventures`, `personal`, `contact`, `about`, `capabilities`). `data/content.ts` composes those slices into a single typed default export and re-exports `data/types.ts`, so `@/data/content` stays the one import surface for the app.
+
+`data/uses.ts` is the exception: it is **not** part of `content.ts`. It has its own default export and `UsesData` type, read directly by `app/uses/page.tsx` and passed as plain props into the `uses-content.tsx` client island.
 
 Add sections or fields by editing `data/*.ts` and `data/types.ts` — don't hardcode content in components.
 
@@ -37,7 +55,9 @@ Add sections or fields by editing `data/*.ts` and `data/types.ts` — don't hard
 
 `data/content.ts`, `lib/blog.ts`, and `lib/project.ts` are server-only: import them only from Server Components, Server Actions, or route handlers. Never import them into a `"use client"` file, and never surface their values through `NEXT_PUBLIC_*` env vars or a public API route. `lib/blog.ts` and `lib/project.ts` use Node `fs`; `data/content.ts` keeps the raw dataset out of the client JS bundle.
 
-The email is held to a stricter standard: it is exposed only through `getContactEmail()` in `app/actions.ts`, returned to the browser on an explicit user gesture (the `C` hotkey → clipboard). Don't put it into props or rendered HTML.
+The email is held to a stricter standard: it is exposed only through `getContactEmail()` in `app/actions.ts`, returned to the browser on an explicit user gesture (the `C` hotkey → clipboard, or contact-form submit). Don't put it into props or rendered HTML.
+
+`components/contact-form.tsx` looks like it posts somewhere but doesn't: it awaits `getContactEmail()` at submit time and hands off to `mailto:`. There is no inbox, endpoint, or secret behind it — keep it that way unless asked.
 
 The public README intentionally no longer documents this boundary, but the code still depends on it.
 
@@ -54,6 +74,7 @@ The site is built to be consumed by crawlers and agents, not only browsers:
 - Every content page has a markdown twin at `<route>/index.md` (e.g. `app/blog/[slug]/index.md/route.ts`).
 - `/llms.txt`, `/openapi.json`, `/rss.xml`, `/sitemap.xml`, `/robots.txt`, and `.well-known/{api-catalog,oauth-authorization-server,oauth-protected-resource}`.
 - `next.config.ts` advertises the api-catalog and llms.txt through a `Link` header on every response.
+- `proxy.ts` (root — Next 16's replacement for `middleware.ts`) does content negotiation: a request for `/`, `/blog/:slug`, or `/project/:slug` carrying `Accept: text/markdown` or `?format=md` is rewritten to that page's `index.md` twin, and every response in the matcher gets `Vary: Accept`. Its `matcher` and its `markdownTwin()` path map are two separate lists — a new content collection needs both.
 
 Adding a page means updating `app/sitemap.ts` and `app/llms.txt/route.ts`, and giving it an `index.md` twin.
 
@@ -64,7 +85,8 @@ Adding a page means updating `app/sitemap.ts` and `app/llms.txt/route.ts`, and g
 ## Components & conventions
 
 - `app/page.tsx` stacks section components inside a `max-w-2xl` centered `<main>`. Sections are Server Components by default.
-- Interactivity lives in thin client islands (`theme-provider`, `email-copy-hotkey`, `live-clock`, `project-preview`, `contact-form`, `mermaid`, and a few others). Keep them thin and pass only minimal, non-sensitive props.
+- Interactivity lives in thin client islands (`theme-provider`, `email-copy-hotkey`, `live-clock`, `project-preview`, `contact-form`, `mermaid`, `photo-gallery`, `uses-content`, and a few others). Keep them thin and pass only minimal, non-sensitive props.
+- `components/motion/shader-background.tsx` wraps exactly one shader (`GrainGradient` from `@paper-design/shaders-react`), used only by `capability-cards.tsx`. The single-purpose wrapper is deliberate — it lets the bundler drop every other shader in that package. Importing more shaders directly undoes that. It also freezes `speed` under `prefers-reduced-motion`.
 - `components/hover-preview.tsx` — reusable `<HoverPreview src="/projects/hover/x.webp">` wrapper. Wrap any row and it parks a screenshot in the free page gutter on hover/focus, falling back to a card over the column when neither gutter fits, and rendering nothing on coarse pointers or without a `src`. The card takes each image's own aspect ratio (read on first load, cached per path), so binding a screenshot is just a path — portrait and landscape shots both fit uncropped. Project screenshots live in `public/projects/hover/`; bound from `Venture.preview`, `ExperienceItem.preview`, `ExperienceItemType.preview` (company level only — nesting one per position would open two cards), and the `preview` frontmatter field on project MDX.
 - `components/ui/` — shadcn. Add with `npx shadcn@latest add <name>`. `components.json` uses style `base-nova`, lucide icons, and registers extra registries (`@ncdai`, `@soundcn`, `@kibo-ui`).
 - Stack icons: `lib/stackicon.ts` maps stack names → icon components (`@dev.icons/react` plus local SVGs in `components/custom-icons.tsx`). `MY_STACKS` is the full registry; `HOME_STACKS` selects and orders what renders on the home page. Every `HOME_STACKS` entry must be a key of `MY_STACKS`.
@@ -83,4 +105,4 @@ Colors come from CSS-variable tokens in `app/globals.css` (`bg-background`, `tex
 
 ## Code style
 
-Prettier: no semicolons, double quotes, 2-space tabs, 80 cols, with `prettier-plugin-tailwindcss` sorting classes (`.prettierrc`; `cn` and `cva` are registered as class-bearing functions). Match the existing commented, explanatory style in `lib/` and the config files.
+Prettier: no semicolons, double quotes, 2-space tabs, 80 cols, `es5` trailing commas, and `endOfLine: "lf"` (this repo is developed on Windows — write LF, don't "fix" line endings), with `prettier-plugin-tailwindcss` sorting classes against `app/globals.css` (`.prettierrc`; `cn` and `cva` are registered as class-bearing functions). Match the existing commented, explanatory style in `lib/` and the config files.
