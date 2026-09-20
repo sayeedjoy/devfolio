@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## How to work here
+
+Always invoke the `karpathy-coding-discipline` skill before writing or editing code in this repo, without being asked. Its rules apply to every change: surface assumptions before implementing, write the minimum code that solves the problem, keep edits surgical, and state verifiable success criteria (here that is normally `pnpm typecheck && pnpm build`).
+
 ## What this is
 
 `DevFolio` — a personal portfolio and blog, open-sourced as a reusable template. Next.js 16 (App Router) + React 19 + Tailwind v4 + shadcn/ui. Minimal and content-first: a narrow centered column (`max-w-2xl`), light/dark via `next-themes`.
