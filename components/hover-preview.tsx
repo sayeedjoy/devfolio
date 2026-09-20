@@ -51,6 +51,40 @@ const OPEN_DELAY = 70
  * phone shots and wide desktop ones size themselves without per-item config.
  */
 const naturalRatios = new Map<string, number>()
+const ratioLoads = new Map<string, Promise<number | null>>()
+
+/**
+ * Warm the exact file the preview renders as soon as the user shows intent and
+ * learn its ratio while the short opening delay runs. These assets are already
+ * compressed WebP screenshots, so routing them through the image optimizer
+ * only adds a cold-request delay.
+ */
+function loadNaturalRatio(src: string) {
+  const cached = naturalRatios.get(src)
+  if (cached) return Promise.resolve(cached)
+
+  const pending = ratioLoads.get(src)
+  if (pending) return pending
+
+  const load = new Promise<number | null>((resolve) => {
+    const image = new window.Image()
+    image.onload = () => {
+      if (!image.naturalWidth || !image.naturalHeight) {
+        resolve(null)
+        return
+      }
+
+      const value = image.naturalWidth / image.naturalHeight
+      naturalRatios.set(src, value)
+      resolve(value)
+    }
+    image.onerror = () => resolve(null)
+    image.src = src
+  })
+
+  ratioLoads.set(src, load)
+  return load
+}
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max)
@@ -183,6 +217,7 @@ export function HoverPreview({
 
   const open = React.useCallback(() => {
     if (!src || !enabled) return
+    void loadNaturalRatio(src)
     if (timer.current) clearTimeout(timer.current)
     timer.current = setTimeout(place, OPEN_DELAY)
   }, [enabled, place, src])
@@ -288,6 +323,7 @@ export function HoverPreview({
                     src={src}
                     alt={alt}
                     fill
+                    unoptimized
                     sizes={`${Math.round(position.width)}px`}
                     onLoad={(event) => {
                       const { naturalWidth, naturalHeight } =
