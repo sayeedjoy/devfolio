@@ -23,6 +23,12 @@ export interface SoftwareItem {
   name: string
   /** path under /public, e.g. "/images/uses/1password.png" */
   icon: string
+  /**
+   * Set for single-colour *white* artwork (the "-dark" variants brands ship for
+   * dark backgrounds). Those vanish against the light-theme tile, so the grid
+   * inverts them in light mode and leaves them untouched in dark mode.
+   */
+  mono?: boolean
 }
 
 /**
@@ -36,8 +42,8 @@ export interface UsesData {
   hardware: HardwareItem[]
   software: SoftwareItem[]
   coding: { note: CodingSegment[] }
-  /** muted note shown under the software grid */
-  softwareNote: string
+  /** optional muted note shown under the software grid */
+  softwareNote?: string
 }
 
 const uses: UsesData = {
@@ -87,13 +93,11 @@ const uses: UsesData = {
   ],
 
   software: [
-    { name: "1Password", icon: "/apps/1password-dark.svg" },
+    { name: "1Password", icon: "/apps/1password-dark.svg", mono: true },
     { name: "Android Studio", icon: "/apps/android-studio.svg" },
     { name: "Notion", icon: "/apps/notion.svg" },
     { name: "VS Code", icon: "/apps/visual-studio-code.svg" },
   ],
-
-  softwareNote: "A short note about your software setup goes here.",
 
   coding: {
     note: [
