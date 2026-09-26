@@ -9,7 +9,7 @@ export function Footer({ minimal = false }: { minimal?: boolean }) {
     <footer className="mt-6 py-8">
       <div className="flex items-center justify-between font-mono text-xs text-muted-foreground">
         <span className="tracking-wider uppercase">
-          © {year} {content.profile.name}
+          © {year}
         </span>
         <LiveClock />
       </div>

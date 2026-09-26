@@ -1,4 +1,4 @@
-import { PhotoGallery } from "@/components/photo-gallery"
+import { ExpandableGallery } from "@/components/expandable-gallery"
 import { Section, SectionIntro, SectionLabel } from "@/components/section"
 import content from "@/data/content"
 
@@ -67,7 +67,7 @@ export function Personal() {
           Contests, hackathons, trips, and the people along the way.
         </SectionIntro>
 
-        <PhotoGallery photos={personal.photos} />
+        <ExpandableGallery photos={personal.photos} />
 
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground sm:text-sm">
           {shotWith ? (

@@ -19,9 +19,12 @@
   "dependencies": {
     "@base-ui/react": "^1.5.0",
     "@dev.icons/react": "^1.1.0",
+    "@hugeicons/core-free-icons": "^4.3.5",
+    "@hugeicons/react": "^1.1.10",
     "@paper-design/shaders-react": "^0.0.81",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cn": "^0.4.0",
     "date-fns": "^4.4.0",
     "dayjs": "^1.11.21",
     "devicons": "^2.0.1",

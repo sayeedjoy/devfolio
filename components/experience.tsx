@@ -30,7 +30,18 @@ export function Experience() {
                       className="size-5 rounded object-cover"
                     />
                   ) : null}
-                  {item.company}
+                  {item.href ? (
+                    <a
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:underline"
+                    >
+                      {item.company}
+                    </a>
+                  ) : (
+                    item.company
+                  )}
                 </h3>
                 <p className="mt-1 max-w-[58ch] text-sm leading-relaxed text-muted-foreground">
                   {item.description}

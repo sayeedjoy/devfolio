@@ -17,6 +17,8 @@ export interface ExperienceItem {
   range: string
   role: string
   company: string
+  /** External URL for the company — wraps the company name in a link. */
+  href?: string
   /** path under /public, e.g. "/logos/foo.png" — shown next to the company */
   logo?: string
   /**

@@ -7,6 +7,7 @@ export const experience: Experience = {
       range: "2020 — 2021",
       role: "Co-Founder & CTO",
       company: "Rumor Scanner",
+      href: "https://en.wikipedia.org/wiki/Rumor_Scanner_Bangladesh",
       logo: "/rs.jpg",
       description:
         "Built the tech for bangladesh largest fact-checking agency. Developed a custom CMS, public-facing website, and internal tools to manage the end-to-end fact-checking process.",
