@@ -1,6 +1,5 @@
-import Image from "next/image"
-
 import { BioLine } from "@/components/bio-line"
+import { Mascot } from "@/components/mascot"
 import { GitHubIcon, LinkedInIcon, XIcon } from "@/components/social-icons"
 
 import content from "@/data/content"
@@ -29,14 +28,15 @@ export function Hero() {
   const { profile } = content
   return (
     <section id="about" className="pt-8 pb-5 sm:pt-10">
-      <Image
-        src={profile.avatar}
-        alt={profile.name}
-        width={80}
-        height={80}
-        priority
-        className="mb-5 size-20 rounded-full object-cover"
-      />
+      {profile.mascot ? (
+        <Mascot
+          directions={profile.mascot.directions}
+          reactions={profile.mascot.reactions}
+          size={104}
+          label={`${profile.name} mascot`}
+          className="mb-5"
+        />
+      ) : null}
       <h1 className="flex items-center gap-1.5 text-2xl font-semibold tracking-tight">
         {profile.name}
         {profile.verified ? <VerifiedBadge /> : null}

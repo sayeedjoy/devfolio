@@ -86,6 +86,8 @@ export interface Profile {
   role: string
   /** path under /public, e.g. "/avatar.jpg" */
   avatar: string
+  /** cursor-tracking mascot: two 3x3 sprite sheets under /public */
+  mascot?: { directions: string; reactions: string }
   /** bio paragraphs; each is a list of inline segments (text/link/tag) */
   bio: BioParagraph[]
   verified: boolean

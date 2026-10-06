@@ -4,6 +4,10 @@ export const profile: Profile = {
   name: "Sayeed Joy",
   role: "Software Engineer",
   avatar: "/photos/joy.webp",
+  mascot: {
+    directions: "/mascots/joy-directions.webp",
+    reactions: "/mascots/joy-reactions.webp",
+  },
   bio: [
     [
       "I enjoy turning complex ideas into software that feels simple and dependable. Most of my work is in enterprise platforms and SaaS, and right now I’m bringing that experience to ",
