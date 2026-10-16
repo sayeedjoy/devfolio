@@ -1,0 +1,51 @@
+---
+title: R2 Manager
+subtitle: A self-hosted file manager for your Cloudflare R2 buckets — browse, upload, preview, edit, and share from the browser.
+date: 2026-09-28
+icon: /projects/r2manager.png
+image: /projects/r2manager.png
+preview: /projects/hover/r2manager-preview.webp
+stack: [TypeScript, React, Hono, PostgreSQL, Drizzle, Tailwind, Docker]
+liveUrl: https://r2manager.sayeedjoy.com/
+githubUrl: https://github.com/sayeedjoy/r2-manager
+---
+
+Cloudflare R2 is cheap, fast object storage, but the dashboard is built for
+operators, not for the people who actually need the files. R2 Manager is the
+missing front end: a file manager you host yourself, where you own the server,
+the database, and the keys.
+
+## What it does
+
+- **Browse, upload, preview** — list and grid views, folders, filtering, and
+  drag-and-drop for whole folders. Images, PDF, Markdown, CSV, and JSON preview
+  in place without a download.
+- **Edit in the browser** — text, Markdown, CSV, and JSON are editable, with
+  ETag conflict detection so two people never silently overwrite each other.
+- **Share links** — public links with an optional password, expiry, and
+  download limit, revocable at any time. Files stream through the app or via
+  short-lived presigned URLs.
+- **Roles and grants** — admin, editor, and viewer roles, scoped to a whole
+  bucket or just a folder prefix.
+- **Sign-in and security** — email and password with TOTP 2FA and recovery
+  codes, or Cloudflare Access in front. Brute-force limits on login, 2FA, and
+  reset; same-origin checks on every mutation; a strict CSP on share pages; and
+  secrets encrypted at rest.
+- **Audit trail** — every action is logged with its actor, target, and outcome,
+  searchable from the admin area.
+
+## How it's built
+
+The UI is React 19 with Vite, TanStack Query, Tailwind v4, and shadcn/ui. A
+single Hono server on Node serves the UI, the API, and the share pages. Uploads
+never pass through it: the server starts a multipart upload and signs the part
+URLs, and the browser sends the bytes straight to R2 — so file size isn't capped
+by the server.
+
+PostgreSQL, through Drizzle, holds users, grants, share links, the audit log,
+and settings, and also backs the rate limits and job state, so there's no Redis
+or queue to run. Migrations apply on every start. A two-stage Dockerfile ships
+an esbuild bundle with no `node_modules` at runtime, and it deploys with Docker
+Compose (with Caddy for automatic HTTPS), Dokploy, or Vercel.
+
+Postgres is the only thing you need to back up.

@@ -1,0 +1,51 @@
+---
+title: Port Baba
+subtitle: A local-first desktop app that finds whatever is holding your dev port and frees it in one click.
+date: 2026-09-05
+icon: /projects/portbaba.png
+image: /projects/portbaba.png
+stack: [Rust, Tauri, TypeScript, React, Tailwind]
+githubUrl: https://github.com/sayeedjoy/portbaba
+---
+
+`Port 3000 is already in use.` Every developer knows the ritual that follows:
+`lsof` or `netstat`, squint at the output, copy a PID, kill it, hope it was the
+right one. Port Baba collapses that loop into one window. Find it. Kill it. Free
+the port.
+
+It's local-first: no account, and no process data ever leaves your machine.
+
+## What it does
+
+- **Instant port lookup** — type a port and see the process, PID, protocol, and
+  state as you type.
+- **Project detection** — a bare `node` process gets labelled with context, like
+  "Vite dev server", so you know what you're about to stop.
+- **One-click cleanup** — tries a graceful shutdown first, with force kill as an
+  explicit option.
+- **Full port and process views** — every TCP (and optionally UDP) socket, with
+  filtering and range scans, or grouped by owning process so related ports stop
+  together.
+- **Favourites, tray, and shortcuts** — common dev ports one click away from the
+  tray, a global shortcut, and a command palette, so the main window can stay
+  closed.
+- **Local history** — the last 500 termination attempts, stored on-device only.
+
+## Built to be safe
+
+Killing the wrong process is worse than not killing one. Port Baba asks before
+it terminates anything, protects known OS processes, validates every port and
+PID in the backend, reports permission errors plainly, and never escalates
+privileges on its own.
+
+## How it's built
+
+A Tauri 2 shell with a React 19 + TypeScript front end (Vite, Tailwind v4,
+shadcn/ui, Zustand). The backend is Rust: `netstat2` discovers sockets and
+`sysinfo` reads process metadata, exposed to the UI as Tauri commands. Settings
+and history live in a local JSON file — there's no database.
+
+GitHub Actions builds a Windows installer and a universal macOS `.dmg` on every
+push to `main` and publishes them as a
+[GitHub Release](https://github.com/sayeedjoy/portbaba/releases); the in-app
+updater picks up new versions from there.

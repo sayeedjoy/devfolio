@@ -2,6 +2,21 @@ import type { Venture } from "./types"
 
 export const ventures: Venture[] = [
   {
+    name: "R2 Manager",
+    description: "Self-hosted file manager for Cloudflare R2",
+    href: "https://r2manager.sayeedjoy.com/",
+    slug: "r2-manager",
+    icon: "/projects/r2manager.png",
+    preview: "/projects/hover/r2manager-preview.webp",
+  },
+  {
+    name: "Port Baba",
+    description: "Kill a busy port in one click",
+    href: "https://github.com/sayeedjoy/portbaba",
+    slug: "portbaba",
+    icon: "/projects/portbaba.png",
+  },
+  {
     name: "FactDrop",
     description: "Ai-Powered Fact-Checking Engine",
     href: "https://factdrop.org/",
