@@ -78,34 +78,14 @@ export const MY_STACKS: Record<string, StackIconComponent> = {
  * Edit this list to choose which stacks appear there (order is preserved).
  * Every entry must be a key of MY_STACKS.
  */
-export const HOME_STACKS: (keyof typeof MY_STACKS)[] = [
-  // Languages
-  "C#",
-  "TypeScript",
-  "Kotlin",
-
-  // Backend
-  "ASP.NET Core",
-  "Node.js",
-
-  // Frontend
-  "React",
-  "Next.js",
-  "Tailwind",
-
-  // Mobile
-  "Android",
-  "Flutter",
-
-  // Databases
-  "MySQL",
-  "PostgreSQL",
-  "Redis",
-  "Firebase",
-
-  // DevOps & Infra
-  "Docker",
-  "NGINX",
-  "Jenkins",
-  "Git",
+export const HOME_STACK_GROUPS = [
+  { label: "Languages", items: ["C#", "TypeScript", "Kotlin"] },
+  { label: "Backend", items: ["ASP.NET Core", "Node.js"] },
+  { label: "Frontend", items: ["React", "Next.js", "Tailwind"] },
+  { label: "Mobile", items: ["Android", "Flutter"] },
+  { label: "Databases", items: ["MySQL", "PostgreSQL", "Redis", "Firebase"] },
+  { label: "DevOps", items: ["Docker", "NGINX", "Jenkins", "Git"] },
 ]
+
+export const HOME_STACKS: (keyof typeof MY_STACKS)[] =
+  HOME_STACK_GROUPS.flatMap((group) => group.items)

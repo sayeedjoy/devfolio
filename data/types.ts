@@ -145,6 +145,20 @@ export interface SiteContent {
   about: About
   /** the three-up pitch block rendered by `<CapabilityCards />` */
   capabilities: Capabilities
+  /** the DevTools console greeting printed by `<ConsoleGreeting />` */
+  consoleGreeting: ConsoleGreeting
+}
+
+/** Copy unique to the console greeting; the rest is read from other slices. */
+export interface ConsoleGreeting {
+  /** multi-line ASCII art printed first */
+  banner: string
+  /** bold one-liner under the banner */
+  tagline: string
+  /** muted aside under the intro */
+  aside: string
+  /** global name for the commands, e.g. "joy" → `joy.help()` */
+  handle: string
 }
 
 /** Icon key for an about-page link row; resolved to a glyph in the component. */

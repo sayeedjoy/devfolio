@@ -20,6 +20,7 @@
 import { about } from "./about"
 import { achievements } from "./achievements"
 import { capabilities } from "./capabilities"
+import { consoleGreeting } from "./console"
 import { contact } from "./contact"
 import { education } from "./education"
 import { experience } from "./experience"
@@ -50,6 +51,7 @@ const content: SiteContent = {
   contact,
   about,
   capabilities,
+  consoleGreeting,
 }
 
 export default content

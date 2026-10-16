@@ -2,8 +2,10 @@ import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 
 import "./globals.css"
+import { ConsoleGreeting } from "@/components/console-greeting"
 import { ThemeProvider } from "@/components/theme-provider"
 import content from "@/data/content"
+import { getConsoleGreetingProps } from "@/lib/console-greeting"
 import { OG_DEFAULTS, RSS_ALTERNATE } from "@/lib/seo"
 import { SITE_URL } from "@/lib/site"
 import { cn } from "@/lib/utils"
@@ -69,6 +71,9 @@ export default function RootLayout({
           only suppresses attribute diffs on <body> itself — not its children. */}
       <body suppressHydrationWarning>
         <ThemeProvider>{children}</ThemeProvider>
+        {/* Everything passed here already renders on the page; the email is
+            not among it (the console's email() command fetches it on demand). */}
+        <ConsoleGreeting {...getConsoleGreetingProps()} />
       </body>
     </html>
   )
