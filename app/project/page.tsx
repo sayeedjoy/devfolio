@@ -4,13 +4,13 @@ import { Footer } from "@/components/footer"
 import { Navbar } from "@/components/navbar"
 import { ProjectList } from "@/components/project-list"
 import { getAllProjects } from "@/lib/project"
-import { SITE_URL } from "@/lib/site"
+import { pageMetadata } from "@/lib/seo"
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Projects",
   description: "Things I've designed, built, and shipped.",
-  alternates: { canonical: `${SITE_URL}/project` },
-}
+  path: "/project",
+})
 
 export default function ProjectIndexPage() {
   const projects = getAllProjects()

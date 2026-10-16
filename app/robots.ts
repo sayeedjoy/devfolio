@@ -10,6 +10,7 @@ const AI_BOTS_ALLOWED = [
   "OAI-SearchBot", // OpenAI — search index
   "ChatGPT-User", // OpenAI — ChatGPT browsing on user request
   "ClaudeBot", // Anthropic — training
+  "Claude-SearchBot", // Anthropic — search index
   "Claude-User", // Anthropic — Claude browsing on user request
   "anthropic-ai", // Anthropic — legacy token
   "PerplexityBot", // Perplexity — search index
@@ -34,6 +35,5 @@ export default function robots(): MetadataRoute.Robots {
       ...AI_BOTS_DENIED.map((userAgent) => ({ userAgent, disallow: "/" })),
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,
-    host: SITE_URL,
   }
 }

@@ -4,12 +4,12 @@ import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import content from "@/data/content"
+import { OG_DEFAULTS, RSS_ALTERNATE } from "@/lib/seo"
 import { SITE_URL } from "@/lib/site"
 import { cn } from "@/lib/utils"
 
-// Concise meta description (kept under ~155 chars for search snippets).
-const siteDescription =
-  "Software Engineer building for web, mobile, and backend. Co-founder & ex-CTO of Rumor Scanner. Now building Link Arena."
+// Home title names the role too, so the entity and the query match.
+const siteTitle = `${content.profile.name} — ${content.profile.role}`
 
 export const metadata: Metadata = {
   // Resolves relative URLs (e.g. frontmatter image paths) in page metadata.
@@ -17,36 +17,26 @@ export const metadata: Metadata = {
   // Child pages set a plain string title (e.g. "Uses"); the template renders it
   // as "PAGE NAME - Site Title". The home page falls back to `default`.
   title: {
-    default: content.profile.name,
+    default: siteTitle,
     template: `%s - ${content.profile.name}`,
   },
-  description: siteDescription,
-  alternates: { canonical: "/" },
+  description: content.profile.summary,
+  // No canonical here: it would be inherited by not-found and any page that
+  // forgets its own. The home page sets "/"; others go through pageMetadata().
+  alternates: { types: RSS_ALTERNATE },
   openGraph: {
+    ...OG_DEFAULTS,
     title: {
-      default: content.profile.name,
+      default: siteTitle,
       template: `%s - ${content.profile.name}`,
     },
-    description: "building scalable systems",
+    description: content.profile.summary,
     type: "website",
     url: "/",
-    siteName: content.profile.name,
-    locale: "en_US",
-    images: [
-      {
-        url: "/og.webp",
-        width: 2400,
-        height: 1260,
-        alt: `${content.profile.name} — ${content.profile.role}`,
-      },
-    ],
   },
-  twitter: {
-    card: "summary_large_image",
-    title: `${content.profile.name} — ${content.profile.role}`,
-    description: siteDescription,
-    images: ["/og.webp"],
-  },
+  // Card type only: Next fills title/description/images from each page's own
+  // openGraph, so the home card never leaks onto other pages.
+  twitter: { card: "summary_large_image" },
   robots: { index: true, follow: true },
 }
 

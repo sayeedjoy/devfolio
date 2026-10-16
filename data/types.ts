@@ -84,6 +84,12 @@ export interface SocialLink {
 export interface Profile {
   name: string
   role: string
+  /**
+   * One third-person sentence or two about you. The site's meta description,
+   * the llms.txt summary and the schema.org Person description all read it,
+   * so search and answer engines see one consistent statement.
+   */
+  summary: string
   /** path under /public, e.g. "/avatar.jpg" */
   avatar: string
   /** cursor-tracking mascot: two 3x3 sprite sheets under /public */

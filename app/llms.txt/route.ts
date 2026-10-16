@@ -10,11 +10,32 @@ import { SITE_URL } from "@/lib/site"
 export const dynamic = "force-static"
 
 export function GET() {
-  const { name, role } = content.profile
+  const { profile, education, experience, ventures, achievements, stack } =
+    content
+  const { name } = profile
 
   // Section of markdown links; omitted entirely when there are no items.
   const section = (title: string, lines: string[]) =>
     lines.length ? `\n## ${title}\n\n${lines.join("\n")}\n` : ""
+
+  // Short, self-contained statements answer engines can quote verbatim.
+  const facts = [
+    ...experience.items.map(
+      (e) => `- Experience: ${e.role} at ${e.company} (${e.range})`
+    ),
+    ...education.flatMap((school) =>
+      school.positions.map(
+        (p) =>
+          `- Education: ${p.title}, ${school.companyName} (${p.employmentPeriod.start}–${p.employmentPeriod.end ?? "present"})`
+      )
+    ),
+    ...ventures.map(
+      (v) => `- Building: [${v.name}](${v.href}), ${v.description}`
+    ),
+    ...achievements.map((a) => `- Achievement: ${a.title}`),
+    `- Stack: ${stack.map((s) => s.name).join(", ")}`,
+    `- Profiles: ${profile.socials.map((s) => `[${s.label}](${s.href})`).join(", ")}`,
+  ]
 
   // Deep links point at the `.md` twins so agents get clean markdown, not HTML.
   const writing = getAllPosts().map(
@@ -28,17 +49,19 @@ export function GET() {
 
   const body = `# ${name}
 
-> ${role} building products across web, mobile, and backend. Co-founder & ex-CTO of Rumor Scanner. Now building Link Arena.
-
+> ${profile.summary}
+${section(`About ${name}`, facts)}
 ## Pages
 
-- [Home](${SITE_URL}/): Profile, experience, stack, and contact.
-- [About](${SITE_URL}/about): About me, work history, and education.
+- [Home](${SITE_URL}/index.md): Profile, experience, projects, stack, and contact.
+- [About](${SITE_URL}/about): Longer bio, what I do, interests, and links.
 - [Blog](${SITE_URL}/blog): Writing on engineering and product.
 - [Projects](${SITE_URL}/project): Things I've built.
+- [Uses](${SITE_URL}/uses): Hardware, software, and editor setup.
 ${section("Writing", writing)}${section("Projects", projects)}
 ## Optional
 
+- [RSS feed](${SITE_URL}/rss.xml)
 - [Sitemap](${SITE_URL}/sitemap.xml)
 `
 

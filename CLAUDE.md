@@ -82,6 +82,8 @@ The site is built to be consumed by crawlers and agents, not only browsers:
 
 Adding a page means updating `app/sitemap.ts` and `app/llms.txt/route.ts`, and giving it an `index.md` twin.
 
+Page metadata goes through `pageMetadata()` in `lib/seo.ts`, never a hand-built `alternates`/`openGraph`: Next replaces those keys whole, so a page that sets its own would drop the root's siteName, locale, fallback OG image and RSS alternate. The root layout sets only `twitter.card` on purpose — Next fills each page's card from its openGraph. Structured data comes from `components/json-ld.tsx` (`personNode()`, `breadcrumbNode()`). A markdown twin's canonical is a `Link` header set in `next.config.ts`, not in the route: config headers override route-handler headers.
+
 ## Site URL
 
 `lib/site.ts` resolves the canonical origin as `SITE_URL` → Vercel host → localhost, and **throws during a production build** when none resolves, so localhost URLs are never published to crawlers and feeds. It is a plain (non-`NEXT_PUBLIC_`) env var by design.

@@ -4,13 +4,13 @@ import { Footer } from "@/components/footer"
 import { Navbar } from "@/components/navbar"
 import { PostList } from "@/components/post-list"
 import { getAllPosts } from "@/lib/blog"
-import { SITE_URL } from "@/lib/site"
+import { pageMetadata } from "@/lib/seo"
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Blog",
   description: "Writing on engineering, design, and building things.",
-  alternates: { canonical: `${SITE_URL}/blog` },
-}
+  path: "/blog",
+})
 
 export default function BlogIndexPage() {
   const posts = getAllPosts()

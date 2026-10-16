@@ -3,6 +3,8 @@ import type { Profile } from "./types"
 export const profile: Profile = {
   name: "Sayeed Joy",
   role: "Software Engineer",
+  summary:
+    "Software Engineer building for web, mobile, and backend. Co-founder & ex-CTO of Rumor Scanner. Now building Link Arena.",
   avatar: "/photos/joy.webp",
   mascot: {
     directions: "/mascots/joy-directions.webp",

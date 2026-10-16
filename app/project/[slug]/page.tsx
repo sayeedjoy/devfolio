@@ -7,11 +7,13 @@ import { ArrowUpRight } from "lucide-react"
 import { BackLink } from "@/components/back-link"
 import { GithubIcon } from "@/components/custom-icons"
 import { Footer } from "@/components/footer"
+import { breadcrumbNode, JsonLd, personNode } from "@/components/json-ld"
 import { MDX } from "@/components/mdx"
 import { Navbar } from "@/components/navbar"
 import { StackIcon } from "@/components/stack-icon"
 import { Button } from "@/components/ui/button"
 import { getAllProjects, getProjectBySlug } from "@/lib/project"
+import { absoluteUrl, pageMetadata } from "@/lib/seo"
 import { SITE_URL } from "@/lib/site"
 import { MY_STACKS } from "@/lib/stackicon"
 
@@ -31,29 +33,17 @@ export async function generateMetadata({
   const project = getProjectBySlug(slug)
   if (!project) return {}
 
-  const { title, subtitle, image } = project.metadata
-  const url = `${SITE_URL}/project/${project.slug}`
-  // Frontmatter images are /public paths; metadata URLs must be absolute.
-  const imageUrl = image ? `${SITE_URL}${image}` : undefined
+  const { title, subtitle, preview } = project.metadata
 
-  return {
+  // `image` is the project's square logo, which crops badly in a large card;
+  // the `preview` screenshot is landscape, else the site OG image is used.
+  return pageMetadata({
     title,
     description: subtitle,
-    alternates: { canonical: url },
-    openGraph: {
-      type: "article",
-      title,
-      description: subtitle,
-      url,
-      images: imageUrl ? [{ url: imageUrl }] : undefined,
-    },
-    twitter: {
-      card: imageUrl ? "summary_large_image" : "summary",
-      title,
-      description: subtitle,
-      images: imageUrl ? [imageUrl] : undefined,
-    },
-  }
+    path: `/project/${project.slug}`,
+    image: preview,
+    markdown: true,
+  })
 }
 
 export default async function ProjectPage({
@@ -65,10 +55,36 @@ export default async function ProjectPage({
   const project = getProjectBySlug(slug)
   if (!project) notFound()
 
-  const { title, subtitle, image, stack, liveUrl, githubUrl } = project.metadata
+  const { title, subtitle, image, stack, liveUrl, githubUrl, date, preview } =
+    project.metadata
+  const url = `${SITE_URL}/project/${project.slug}`
 
   return (
     <>
+      <JsonLd
+        data={{
+          "@graph": [
+            {
+              "@type": "CreativeWork",
+              "@id": `${url}#project`,
+              name: title,
+              description: subtitle,
+              url,
+              sameAs: liveUrl,
+              dateCreated: date,
+              image: preview ? absoluteUrl(preview) : undefined,
+              keywords: stack,
+              inLanguage: "en",
+              author: personNode(),
+            },
+            breadcrumbNode([
+              ["Home", "/"],
+              ["Projects", "/project"],
+              [title, `/project/${project.slug}`],
+            ]),
+          ],
+        }}
+      />
       <Navbar />
       <main className="mx-auto max-w-2xl px-6 py-10">
         <BackLink href="/project" />

@@ -4,14 +4,14 @@ import { Footer } from "@/components/footer"
 import { Navbar } from "@/components/navbar"
 import { UsesContent } from "@/components/uses-content"
 import uses from "@/data/uses"
-import { SITE_URL } from "@/lib/site"
+import { pageMetadata } from "@/lib/seo"
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Uses",
   description:
     "The hardware, software, browser extensions, and editor setup I use every day.",
-  alternates: { canonical: `${SITE_URL}/uses` },
-}
+  path: "/uses",
+})
 
 // Server component: reads the server-only `data/uses.ts` and passes plain,
 // serializable props into the `UsesContent` client island (which owns the tab

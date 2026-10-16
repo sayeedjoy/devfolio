@@ -9,14 +9,14 @@ import { Footer } from "@/components/footer"
 import { Navbar } from "@/components/navbar"
 import { Section, SectionLabel } from "@/components/section"
 import content from "@/data/content"
-import { SITE_URL } from "@/lib/site"
+import { pageMetadata } from "@/lib/seo"
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "About",
   description:
     "Something about me — what I do, what I'm into, and how to reach me.",
-  alternates: { canonical: `${SITE_URL}/about` },
-}
+  path: "/about",
+})
 
 /** One of the two narrow lists that sit beside the bio. */
 function Rail({ label, items }: { label: string; items: string[] }) {

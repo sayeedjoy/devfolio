@@ -7,6 +7,20 @@ const scriptSrc = isDev
   ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
   : "script-src 'self' 'unsafe-inline'"
 
+const DISCOVERY_LINKS = [
+  '</.well-known/api-catalog>; rel="api-catalog"',
+  '</llms.txt>; rel="describedby"; type="text/markdown"',
+].join(", ")
+
+// Markdown twin → the HTML page it mirrors, so search engines treat the twin
+// as an alternate rather than duplicate content. `:slug` is filled from the
+// matched path.
+const markdownTwins = [
+  { source: "/index.md", canonical: "/" },
+  { source: "/blog/:slug/index.md", canonical: "/blog/:slug" },
+  { source: "/project/:slug/index.md", canonical: "/project/:slug" },
+]
+
 // Security headers applied to every route. CSP is intentionally permissive for
 // inline styles (Next injects them) but blocks framing and object embeds.
 const securityHeaders = [
@@ -14,10 +28,7 @@ const securityHeaders = [
     // Advertise machine-readable discovery entry points to agents/crawlers on
     // every response: the API catalog (RFC 9727) and the llms.txt site map.
     key: "Link",
-    value: [
-      '</.well-known/api-catalog>; rel="api-catalog"',
-      '</llms.txt>; rel="describedby"; type="text/markdown"',
-    ].join(", "),
+    value: DISCOVERY_LINKS,
   },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Frame-Options", value: "DENY" },
@@ -55,7 +66,21 @@ const nextConfig: NextConfig = {
     qualities: [75, 100],
   },
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }]
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      // Same-key headers don't merge — the last matching rule wins, and config
+      // headers also override ones a route handler sets — so each twin repeats
+      // the discovery links alongside its canonical.
+      ...markdownTwins.map(({ source, canonical }) => ({
+        source,
+        headers: [
+          {
+            key: "Link",
+            value: `${DISCOVERY_LINKS}, <${canonical}>; rel="canonical"`,
+          },
+        ],
+      })),
+    ]
   },
 }
 

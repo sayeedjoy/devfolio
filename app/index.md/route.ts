@@ -11,7 +11,7 @@ import { SITE_URL } from "@/lib/site"
 export const dynamic = "force-static"
 
 export function GET() {
-  const { profile, contact } = content
+  const { profile } = content
 
   // Section of markdown links; omitted entirely when there are no items.
   const section = (title: string, lines: string[]) =>
@@ -19,7 +19,7 @@ export function GET() {
 
   const bio = profile.bio.map((p) => bioText(p)).join("\n\n")
 
-  const socials = contact.socials.map((s) => `- [${s.label}](${s.href})`)
+  const socials = profile.socials.map((s) => `- [${s.label}](${s.href})`)
 
   const writing = getAllPosts().map(
     (p) =>
@@ -32,16 +32,17 @@ export function GET() {
 
   const body = `# ${profile.name}
 
-> ${profile.role}
+> ${profile.summary}
 
 ${bio}
 
 ## Pages
 
-- [Home](${SITE_URL}/): Profile, experience, stack, and contact.
-- [About](${SITE_URL}/about): About me, work history, and education.
+- [Home](${SITE_URL}/): Profile, experience, projects, stack, and contact.
+- [About](${SITE_URL}/about): Longer bio, what I do, interests, and links.
 - [Blog](${SITE_URL}/blog): Writing on engineering and product.
 - [Projects](${SITE_URL}/project): Things I've built.
+- [Uses](${SITE_URL}/uses): Hardware, software, and editor setup.
 ${section("Writing", writing)}${section("Projects", projects)}${section("Connect", socials)}
 ## Optional
 
