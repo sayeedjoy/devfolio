@@ -24,8 +24,8 @@ export interface ConsoleGreetingProps {
   links: { label: string; href: string }[]
 }
 
-// DevTools supports text styling, not page layout. Each log is a readable row;
-// the shared gutter and section rails give the output its own visual identity.
+// DevTools supports text styling, not page layout. Each log is one plain row;
+// numbered headings and blank lines do the structuring, nothing else.
 const SUNSET = [
   "#d97706",
   "#ea580c",
@@ -37,16 +37,13 @@ const SUNSET = [
 // Consolas is named because Windows has none of the others, and the generic
 // fallback can draw the banner's box characters at the wrong width.
 const MONO =
-  "font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.8"
+  "font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.6"
 const S = {
   plain: MONO,
   bold: `${MONO};font-weight:700`,
   muted: `${MONO};color:#808080`,
-  key: `${MONO};color:#b56b2a;font-weight:700`,
-  prompt: `${MONO};color:${SUNSET[0]};font-weight:700`,
-  star: `${MONO};color:${SUNSET[3]}`,
+  accent: `${MONO};color:${SUNSET[0]}`,
   quote: `${MONO};font-style:italic`,
-  heading: `${MONO};color:#d97706;font-weight:700`,
 }
 
 type Part = [text: string, style: string]
@@ -80,12 +77,8 @@ function wrap(text: string, max: number) {
   return [...lines, line]
 }
 
-function row(...parts: Part[]) {
-  log(["  │  ", S.muted], ...parts)
-}
-
-function section(title: string) {
-  log(["  │\n", S.muted], [`  ├── ${title}`, S.heading])
+function blank() {
+  log([" ", S.plain])
 }
 
 /** The sunset wordmark is the signature; everything below stays restrained. */
@@ -100,104 +93,111 @@ function printCard(props: ConsoleGreetingProps) {
       ]
     )
   )
-  log(
-    ["  ┌── ", S.heading],
-    ["JOY / PORTFOLIO", S.bold],
-    [`  ·  ${host}`, S.muted]
-  )
-  row([tagline, S.bold])
-  row(
-    [name, S.bold],
-    [`  /  ${facts.find(([label]) => label === "Role")?.[1] ?? ""}`, S.muted]
-  )
-  row([summary, S.plain])
-  row([aside, S.muted])
+  blank()
+  log([tagline, S.bold])
+  log([
+    `${name} · ${facts.find(([label]) => label === "Role")?.[1] ?? ""} · ${host}`,
+    S.muted,
+  ])
+  blank()
+  log([summary, S.plain])
+  log([aside, S.muted])
 }
 
-function printProjects({ projects, handle }: ConsoleGreetingProps) {
-  section("Projects")
+function printProjects({ projects }: ConsoleGreetingProps) {
   const nameW = width(projects.map((p) => p.name))
   const descW = width(projects.map((p) => p.description))
   for (const p of projects) {
-    row(
+    log(
       [p.name.padEnd(nameW), S.bold],
       [p.description.padEnd(descW), S.muted],
       [p.href, S.plain]
     )
   }
-  row([`Show projects: ${handle}.projects()`, S.muted])
 }
 
-function printWins({ wins, handle }: ConsoleGreetingProps) {
+function printWins({ wins }: ConsoleGreetingProps) {
   // "Codeforces — 250+ Problems" splits into a bold name and its result.
   const rows = wins.map((w) => w.split(" — ") as [string, string?])
   const w = width(rows.map(([name]) => name))
-  section("Achievements")
   for (const [name, result = ""] of rows) {
-    row(["✦  ", S.star], [name.padEnd(w), S.bold], [result, S.plain])
+    log([name.padEnd(w), S.bold], [result, S.plain])
   }
-  row([`Show achievements: ${handle}.wins()`, S.muted])
 }
 
-function printPosts({ posts, handle }: ConsoleGreetingProps) {
-  section("Latest blog posts")
-  if (!posts.length) row(["No posts published yet.", S.muted])
+function printPosts({ posts }: ConsoleGreetingProps) {
+  if (!posts.length) log(["No posts published yet.", S.muted])
   for (const p of posts) {
-    row([`${p.date}  `, S.muted], [p.title, S.bold])
-    row([p.url, S.plain])
+    log([`${p.date}  `, S.muted], [`${p.title}\n`, S.bold], [p.url, S.plain])
   }
-  row([`Show posts: ${handle}.posts()`, S.muted])
 }
 
 function printTestimonial({ testimonial: t }: ConsoleGreetingProps) {
-  section("Recommendation")
-  for (const line of wrap(`“${t.quote}”`, 92)) row([line, S.quote])
-  row([`— ${t.author}`, S.bold], [` / ${t.role} · ${t.org}`, S.muted])
+  log(
+    [`${wrap(`“${t.quote}”`, 80).join("\n")}\n`, S.quote],
+    [`— ${t.author}`, S.bold],
+    [` / ${t.role} · ${t.org}`, S.muted]
+  )
 }
 
 function printStack({ stack }: ConsoleGreetingProps) {
-  section("Tech stack")
-  const labelW = width(stack.map((group) => group.label))
-  for (const group of stack) {
-    row([group.label.padEnd(labelW), S.key], [group.items.join(" · "), S.plain])
-  }
+  log([stack.flatMap((group) => group.items).join(" · "), S.plain])
 }
 
 function printLinks({ links, handle }: ConsoleGreetingProps) {
-  const w = width(links.map((l) => l.label))
-  section("Contact & links")
-  for (const l of links) row([l.label.padEnd(w), S.key], [l.href, S.plain])
-  row(
-    ["Email".padEnd(w), S.key],
-    [`${handle}.email()`, S.prompt],
-    ["  copy my address", S.muted]
+  const w = width([...links.map((l) => l.label), "email"])
+  for (const l of links) {
+    log([l.label.toLowerCase().padEnd(w), S.accent], [l.href, S.plain])
+  }
+  log(
+    ["email".padEnd(w), S.accent],
+    [`${handle}.email()`, S.plain],
+    ["  copies my address", S.muted]
   )
+}
+
+type Printer = (p: ConsoleGreetingProps) => void
+
+// Heading, the command that prints it alone (if any), and its body.
+const SECTIONS: [title: string, command: string | null, print: Printer][] = [
+  ["Projects", "projects", printProjects],
+  ["Achievements", "wins", printWins],
+  ["Stack", null, printStack],
+  ["Latest posts", "posts", printPosts],
+  ["Recommendation", null, printTestimonial],
+  ["Links", "links", printLinks],
+]
+
+/** "01 — PROJECTS", its rows, then the command that reprints it. */
+function printSection(props: ConsoleGreetingProps, index: number) {
+  const [title, , print] = SECTIONS[index]
+  blank()
+  log([
+    `${String(index + 1).padStart(2, "0")} — ${title.toUpperCase()}`,
+    S.accent,
+  ])
+  print(props)
 }
 
 function printGreeting(props: ConsoleGreetingProps) {
   const { handle, siteUrl } = props
   printCard(props)
-  printProjects(props)
-  printWins(props)
-  printStack(props)
-  printPosts(props)
-  printTestimonial(props)
-  printLinks(props)
+  SECTIONS.forEach((_, i) => printSection(props, i))
+  blank()
   log(
-    ["  │\n  └── ", S.heading],
-    ["Console commands", S.bold],
-    [` · Type ${handle}.help() to see all commands.`, S.muted]
+    ["Want the full portfolio? Type ", S.bold],
+    [`${handle}.help()`, S.accent]
   )
-  log(
-    ["       AI-readable portfolio: ", S.muted],
-    [`${siteUrl}/llms.txt`, S.plain]
-  )
+  log(["AI-readable portfolio: ", S.muted], [`${siteUrl}/llms.txt`, S.plain])
 }
 
 /** The `<handle>.*()` commands, installed on `window`. */
 function createCommands(props: ConsoleGreetingProps) {
-  const run = (print: (p: ConsoleGreetingProps) => void) => () => {
-    print(props)
+  const run = (command: string) => () => {
+    printSection(
+      props,
+      SECTIONS.findIndex(([, c]) => c === command)
+    )
   }
 
   return {
@@ -213,23 +213,23 @@ function createCommands(props: ConsoleGreetingProps) {
       const w = width(rows.map(([c]) => `${props.handle}.${c}`))
       log(
         ...rows.flatMap(([c, desc]): Part[] => [
-          [`${props.handle}.${c}`.padEnd(w), S.prompt],
+          [`${props.handle}.${c}`.padEnd(w), S.accent],
           [`${desc}\n`, S.muted],
         ])
       )
     },
-    about: run(printCard),
-    projects: run(printProjects),
-    wins: run(printWins),
-    posts: run(printPosts),
-    links: run(printLinks),
+    about: () => printCard(props),
+    projects: run("projects"),
+    wins: run("wins"),
+    posts: run("posts"),
+    links: run("links"),
     // Typing the command is the explicit gesture: the address is fetched from
     // the Server Action only now, never shipped in props.
     email: () => {
       void getContactEmail().then(async (email) => {
         try {
           await navigator.clipboard.writeText(email)
-          log(["Copied to clipboard ✓", S.prompt])
+          log(["Copied to clipboard ✓", S.accent])
         } catch {
           // DevTools holds focus, so the page often can't write the clipboard.
           log([email, S.bold])
