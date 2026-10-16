@@ -248,7 +248,9 @@ export function HoverPreview({
     }
   }, [isOpen, place])
 
-  if (!src) return <>{children}</>
+  // No preview: still apply `className`, since callers use it for layout.
+  if (!src)
+    return className ? <div className={className}>{children}</div> : children
 
   return (
     <div
